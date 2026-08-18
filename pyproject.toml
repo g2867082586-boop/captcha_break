@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "captcha-break-learning"
+version = "0.1.0"
+description = "A VS Code friendly captcha generation and recognition learning project"
+readme = "README.md"
+requires-python = ">=3.10,<3.15"
+license = { file = "LICENSE" }
+authors = [{ name = "ypwhs and contributors" }]
+dependencies = [
+    "captcha>=0.5.0",
+    "numpy>=1.24",
+    "Pillow>=9.5",
+]
+
+[project.optional-dependencies]
+train = [
+    "torch>=2.3",
+    "tqdm>=4.66",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+tensorboard = [
+    "tensorboard>=2.16",
+]
+
+[project.scripts]
+captcha-break = "captcha_break.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+

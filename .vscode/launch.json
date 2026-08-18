@@ -1,0 +1,73 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "01 - 生成验证码",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "captcha_break",
+      "args": [
+        "sample",
+        "--output",
+        "artifacts/debug_sample.png"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "02 - 快速训练 CNN",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "captcha_break",
+      "args": [
+        "train",
+        "--model",
+        "cnn",
+        "--epochs",
+        "1",
+        "--batch-size",
+        "8",
+        "--steps-per-epoch",
+        "5",
+        "--validation-steps",
+        "2"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "03 - 快速训练 CTC",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "captcha_break",
+      "args": [
+        "train",
+        "--model",
+        "ctc",
+        "--epochs",
+        "1",
+        "--batch-size",
+        "8",
+        "--steps-per-epoch",
+        "5",
+        "--validation-steps",
+        "2"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "调试当前 Python 文件",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
+

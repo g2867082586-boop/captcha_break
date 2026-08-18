@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Training outputs
+artifacts/*
+!artifacts/.gitkeep
+runs/
+*.pt
+*.pth
+*.csv
+
+# Editors and operating systems
+.idea/
+.DS_Store
+Thumbs.db
+
