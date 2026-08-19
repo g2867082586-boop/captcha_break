@@ -271,6 +271,93 @@
       "justMyCode": true
     },
     {
+      "name": "13 - 划分真实数据（100训练 + 38验证）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/31_split_real_dataset.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "C:/Users/Thinkpad/Downloads/img_split",
+        "--train-size",
+        "100",
+        "--seed",
+        "2031"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "14 - 用100张真实图微调 v3",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/32_finetune_real.py",
+      "args": [
+        "artifacts/project_cnn_v3.pt",
+        "C:/Users/Thinkpad/Downloads/img_split/train",
+        "C:/Users/Thinkpad/Downloads/img_split/validation",
+        "--epochs",
+        "20",
+        "--batch-size",
+        "16",
+        "--repeats",
+        "16",
+        "--learning-rate",
+        "0.0001",
+        "--output",
+        "artifacts/project_cnn_real_finetuned.pt"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "15 - 对照 BotDetect 风格生成器",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/33_botdetect_style_preview.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "--per-style",
+        "4",
+        "--output",
+        "artifacts/botdetect_style_preview"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "16 - 训练项目 CNN v6（BotDetect 字体池）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/24_project_train_full.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img_split/validation",
+        "--source-preset",
+        "botdetect",
+        "--geometry-preset",
+        "enhanced",
+        "--epochs",
+        "10",
+        "--batch-size",
+        "32",
+        "--steps-per-epoch",
+        "100",
+        "--validation-steps",
+        "20",
+        "--target-characters",
+        "JMPTUWV",
+        "--target-probability",
+        "0.35",
+        "--output",
+        "artifacts/project_cnn_v6.pt"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
       "name": "调试当前 Python 文件",
       "type": "debugpy",
       "request": "launch",

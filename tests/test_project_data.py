@@ -8,6 +8,7 @@ from PIL import Image
 from captcha_break.codec import decode_indices
 from captcha_break.config import DEFAULT_ALPHABET
 from captcha_break.data import (
+    AugmentedRealCaptchaDataset,
     ProjectCaptchaDataset,
     RealCaptchaDataset,
     TargetedLabelSampling,
@@ -61,6 +62,18 @@ def test_real_dataset_rejects_wrong_image_size(tmp_path) -> None:
         assert "expected image size" in str(error)
     else:
         raise AssertionError("wrong-sized real image should be rejected")
+
+
+def test_augmented_real_dataset_repeats_and_preserves_label(tmp_path) -> None:
+    Image.new("L", (200, 50), 180).save(tmp_path / "A7K2_001.png")
+    real_dataset = RealCaptchaDataset(tmp_path, characters=DEFAULT_ALPHABET)
+    dataset = AugmentedRealCaptchaDataset(real_dataset, repeats=3, seed=7)
+
+    image, target = dataset[2]
+
+    assert len(dataset) == 3
+    assert image.shape == (1, 50, 200)
+    assert decode_indices(target.tolist(), dataset.characters) == "A7K2"
 
 
 def test_label_from_filename_validates_characters() -> None:

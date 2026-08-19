@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 
 from captcha_break.data import ProjectCaptchaDataset, RealCaptchaDataset, TargetedLabelSampling
 from captcha_break.models import ProjectCaptchaCNN
-from captcha_break.project_generator import project_style_for_geometry
+from captcha_break.project_generator import project_style_for_source
 from captcha_break.project_training import FixedLengthMetrics, run_fixed_length_epoch
 from captcha_break.training import resolve_device
 
@@ -31,6 +31,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument(
         "--geometry-preset", choices=("classic", "enhanced"), default="enhanced"
+    )
+    parser.add_argument(
+        "--source-preset",
+        choices=("legacy", "botdetect"),
+        default="legacy",
+        help="legacy keeps one font; botdetect samples a matched Windows font pool",
     )
     parser.add_argument("--target-characters", default="JMPTUWV")
     parser.add_argument("--target-probability", type=float, default=0.35)
@@ -79,7 +85,7 @@ def main() -> None:
     torch.manual_seed(args.seed)
     device = resolve_device(args.device)
 
-    style = project_style_for_geometry(args.geometry_preset)
+    style = project_style_for_source(args.source_preset, args.geometry_preset)
     label_sampling = TargetedLabelSampling(
         characters=args.target_characters.upper(),
         probability=args.target_probability,
@@ -140,6 +146,7 @@ def main() -> None:
 
     print(f"Device: {device}")
     print(f"Geometry preset: {args.geometry_preset}")
+    print(f"Source preset: {args.source_preset}")
     print(f"Training samples per epoch: {len(train_dataset)} (dynamic, seed=None)")
     print(
         f"Targeted training labels: {label_sampling.characters}, "
@@ -175,6 +182,7 @@ def main() -> None:
                     "format_version": 1,
                     "model_kind": "project_cnn",
                     "geometry_preset": args.geometry_preset,
+                    "source_preset": args.source_preset,
                     "model_state": model.state_dict(),
                     "optimizer_state": optimizer.state_dict(),
                     "epoch": epoch,

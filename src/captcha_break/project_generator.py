@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal, cast
 
@@ -12,11 +12,35 @@ from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 VisualStyle = Literal["clean_outline", "noisy_outline", "solid"]
 GeometryPreset = Literal["classic", "enhanced"]
+SourcePreset = Literal["legacy", "botdetect"]
 PROJECT_ALPHABET = "34689ABCDEHJKMNPRTUVWXY"
 VISUAL_STYLES: tuple[VisualStyle, ...] = (
     "clean_outline",
     "noisy_outline",
     "solid",
+)
+
+# The three visual families observed in the real set closely match these
+# documented BotDetect styles.  The names are descriptive metadata only; no
+# captcha.com images or proprietary drawing code are bundled with this project.
+BOTDETECT_STYLE_NAMES: dict[VisualStyle, str] = {
+    "clean_outline": "Overlap2",
+    "noisy_outline": "Rough",
+    "solid": "BlackOverlap",
+}
+
+# BotDetect varies glyph shapes much more than the original single-font Python
+# approximation.  These are ordinary Windows fonts with similar broad families.
+# Missing fonts are skipped, and a portable Pillow font fallback is always used.
+BOTDETECT_FONT_CANDIDATES: tuple[str, ...] = (
+    "C:/Windows/Fonts/times.ttf",
+    "C:/Windows/Fonts/timesi.ttf",
+    "C:/Windows/Fonts/BOOKOS.TTF",
+    "C:/Windows/Fonts/BOOKOSI.TTF",
+    "C:/Windows/Fonts/CENTURY.TTF",
+    "C:/Windows/Fonts/BASKVILL.TTF",
+    "C:/Windows/Fonts/GARA.TTF",
+    "C:/Windows/Fonts/ARIALN.TTF",
 )
 
 
@@ -103,6 +127,7 @@ class ProjectCaptchaStyle:
     length: int = 4
     alphabet: str = PROJECT_ALPHABET
     font_path: str | None = None
+    font_candidates: tuple[str, ...] = ()
     font_size: int = 63
     font_size_jitter: int = 5
     horizontal_scale: float = 1.45
@@ -195,6 +220,20 @@ def project_style_for_geometry(preset: GeometryPreset) -> ProjectCaptchaStyle:
     raise ValueError(f"unknown geometry preset: {preset}")
 
 
+def project_style_for_source(
+    preset: SourcePreset,
+    geometry: GeometryPreset = "enhanced",
+) -> ProjectCaptchaStyle:
+    """Build a reproducible legacy or BotDetect-inspired source preset."""
+
+    style = project_style_for_geometry(geometry)
+    if preset == "legacy":
+        return style
+    if preset == "botdetect":
+        return replace(style, font_candidates=BOTDETECT_FONT_CANDIDATES)
+    raise ValueError(f"unknown source preset: {preset}")
+
+
 def _resolve_font_path(explicit_path: str | None) -> str:
     candidates = [
         explicit_path,
@@ -217,6 +256,27 @@ def _resolve_font_path(explicit_path: str | None) -> str:
     raise FileNotFoundError("No usable TrueType font was found")
 
 
+def _resolve_font_paths(explicit_path: str | None, candidates: tuple[str, ...]) -> tuple[str, ...]:
+    requested = ((explicit_path,) if explicit_path else ()) + candidates
+    resolved: list[str] = []
+    for candidate in requested:
+        path = Path(candidate).expanduser()
+        if path.is_file():
+            value = str(path.resolve())
+        else:
+            try:
+                ImageFont.truetype(candidate, 12)
+            except OSError:
+                continue
+            value = candidate
+        if value not in resolved:
+            resolved.append(value)
+
+    if not resolved:
+        resolved.append(_resolve_font_path(explicit_path))
+    return tuple(resolved)
+
+
 class ProjectCaptchaGenerator:
     """Generate four-character captchas using observed project style frequencies."""
 
@@ -226,7 +286,12 @@ class ProjectCaptchaGenerator:
         profiles: dict[VisualStyle, CaptchaVisualProfile] | None = None,
     ) -> None:
         self.style = style or ProjectCaptchaStyle()
-        self.font_path = _resolve_font_path(self.style.font_path)
+        self.font_paths = _resolve_font_paths(
+            self.style.font_path,
+            self.style.font_candidates,
+        )
+        # Kept for compatibility with earlier lessons and preview output.
+        self.font_path = self.font_paths[0]
         self.profiles = dict(profiles or DEFAULT_VISUAL_PROFILES)
         missing = set(VISUAL_STYLES) - set(self.profiles)
         if missing:
@@ -306,7 +371,7 @@ class ProjectCaptchaGenerator:
             self.style.font_size - self.style.font_size_jitter,
             self.style.font_size + self.style.font_size_jitter,
         )
-        font = ImageFont.truetype(self.font_path, font_size)
+        font = ImageFont.truetype(rng.choice(self.font_paths), font_size)
         if self.style.independent_horizontal_scale:
             horizontal_scales = [
                 rng.uniform(

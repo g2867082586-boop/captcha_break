@@ -4,11 +4,14 @@ import pytest
 from PIL import ImageStat
 
 from captcha_break.project_generator import (
+    BOTDETECT_FONT_CANDIDATES,
+    BOTDETECT_STYLE_NAMES,
     PROJECT_ALPHABET,
     VISUAL_STYLES,
     ProjectCaptchaGenerator,
     ProjectCaptchaStyle,
     project_style_for_geometry,
+    project_style_for_source,
 )
 
 
@@ -96,3 +99,22 @@ def test_geometry_presets_keep_ablation_variables_separate() -> None:
     assert enhanced.vertical_scale_jitter == 0.10
     assert enhanced.shear_degrees == 6.0
     assert enhanced.overlap_max == 22
+
+
+def test_botdetect_source_preset_adds_font_variation_without_changing_shape() -> None:
+    legacy = project_style_for_source("legacy")
+    botdetect = project_style_for_source("botdetect")
+
+    assert legacy.font_candidates == ()
+    assert botdetect.font_candidates == BOTDETECT_FONT_CANDIDATES
+    assert botdetect.width == legacy.width == 200
+    assert botdetect.height == legacy.height == 50
+    assert botdetect.alphabet == legacy.alphabet
+
+
+def test_observed_visual_families_have_botdetect_reference_names() -> None:
+    assert BOTDETECT_STYLE_NAMES == {
+        "clean_outline": "Overlap2",
+        "noisy_outline": "Rough",
+        "solid": "BlackOverlap",
+    }

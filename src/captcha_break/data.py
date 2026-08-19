@@ -9,7 +9,7 @@ from typing import Literal
 
 import numpy as np
 import torch
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter
 from torch.utils.data import Dataset
 
 from .codec import encode_text
@@ -200,5 +200,53 @@ class RealCaptchaDataset(Dataset[tuple[torch.Tensor, torch.Tensor]]):
             raise ValueError(
                 f"expected image size {self.expected_size}, got {image.size}: {path.name}"
             )
+        target = torch.tensor(encode_text(text, self.characters), dtype=torch.long)
+        return grayscale_image_to_tensor(image), target
+
+
+class AugmentedRealCaptchaDataset(Dataset[tuple[torch.Tensor, torch.Tensor]]):
+    """Repeat labeled real captchas with conservative online image augmentation."""
+
+    def __init__(
+        self,
+        dataset: RealCaptchaDataset,
+        *,
+        repeats: int = 16,
+        seed: int | None = None,
+    ) -> None:
+        if repeats <= 0:
+            raise ValueError("repeats must be positive")
+        self.dataset = dataset
+        self.repeats = repeats
+        self.seed = seed
+        self.characters = dataset.characters
+
+    def __len__(self) -> int:
+        return len(self.dataset) * self.repeats
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
+        if not 0 <= index < len(self):
+            raise IndexError(index)
+        source_index = index % len(self.dataset)
+        path, text = self.dataset.samples[source_index]
+        rng = random.Random(self.seed + index) if self.seed is not None else random.Random()
+        with Image.open(path) as source:
+            image = source.convert("L")
+        if image.size != self.dataset.expected_size:
+            raise ValueError(
+                f"expected image size {self.dataset.expected_size}, got {image.size}: {path.name}"
+            )
+
+        image = image.rotate(
+            rng.uniform(-2.0, 2.0),
+            resample=Image.Resampling.BICUBIC,
+            translate=(rng.randint(-3, 3), rng.randint(-2, 2)),
+            fillcolor=255,
+        )
+        image = ImageEnhance.Contrast(image).enhance(rng.uniform(0.90, 1.10))
+        image = ImageEnhance.Brightness(image).enhance(rng.uniform(0.96, 1.04))
+        if rng.random() < 0.20:
+            image = image.filter(ImageFilter.GaussianBlur(radius=rng.uniform(0.1, 0.4)))
+
         target = torch.tensor(encode_text(text, self.characters), dtype=torch.long)
         return grayscale_image_to_tensor(image), target
