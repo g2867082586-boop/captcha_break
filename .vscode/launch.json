@@ -60,6 +60,217 @@
       "justMyCode": true
     },
     {
+      "name": "04 - 对比项目 CNN v1 和 v2",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/27_compare_project_checkpoints.py",
+      "args": [
+        "artifacts/project_cnn_best.pt",
+        "artifacts/project_cnn_v2.pt",
+        "C:/Users/Thinkpad/Downloads/img",
+        "--output",
+        "artifacts/checkpoint_comparison"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "05 - 分析 CNN 位置和混淆",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/28_analyze_checkpoint_changes.py",
+      "args": [
+        "artifacts/checkpoint_comparison/comparison.csv",
+        "--output",
+        "artifacts/checkpoint_change_analysis"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "06 - 预览针对性字符采样",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/29_targeted_label_sampling.py",
+      "args": [
+        "--samples",
+        "10000",
+        "--target-characters",
+        "JMPTUWV",
+        "--target-probability",
+        "0.35"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "07 - 训练项目 CNN v3（23字符）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/24_project_train_full.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "--epochs",
+        "10",
+        "--batch-size",
+        "32",
+        "--steps-per-epoch",
+        "100",
+        "--validation-steps",
+        "20",
+        "--target-characters",
+        "JMPTUWV",
+        "--target-probability",
+        "0.35",
+        "--output",
+        "artifacts/project_cnn_v3.pt"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "08 - 校准困难字符 J/B/3/W",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/30_hard_character_calibration.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "artifacts/checkpoint_comparison_v2_v3/comparison.csv",
+        "--characters",
+        "JB3W",
+        "--per-character",
+        "6"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "09 - 预览 v4 困难字符采样",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/29_targeted_label_sampling.py",
+      "args": [
+        "--samples",
+        "10000",
+        "--target-characters",
+        "JB3W",
+        "--target-probability",
+        "0.55",
+        "--target-position-weights",
+        "1",
+        "1",
+        "1",
+        "1",
+        "--output",
+        "artifacts/targeted_sampling_v4"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "10 - 训练项目 CNN v4（困难字符增强）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/24_project_train_full.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "--epochs",
+        "10",
+        "--batch-size",
+        "32",
+        "--steps-per-epoch",
+        "100",
+        "--validation-steps",
+        "20",
+        "--target-characters",
+        "JB3W",
+        "--target-probability",
+        "0.55",
+        "--target-position-weights",
+        "1",
+        "1",
+        "1",
+        "1",
+        "--output",
+        "artifacts/project_cnn_v4.pt"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "11 - 训练 v5A（旧几何 + 新采样）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/24_project_train_full.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "--geometry-preset",
+        "classic",
+        "--epochs",
+        "10",
+        "--batch-size",
+        "32",
+        "--steps-per-epoch",
+        "100",
+        "--validation-steps",
+        "20",
+        "--target-characters",
+        "JB3W",
+        "--target-probability",
+        "0.55",
+        "--target-position-weights",
+        "1",
+        "1",
+        "1",
+        "1",
+        "--output",
+        "artifacts/project_cnn_v5a.pt"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "12 - 训练 v5B（新几何 + 旧采样）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/24_project_train_full.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "--geometry-preset",
+        "enhanced",
+        "--epochs",
+        "10",
+        "--batch-size",
+        "32",
+        "--steps-per-epoch",
+        "100",
+        "--validation-steps",
+        "20",
+        "--target-characters",
+        "JMPTUWV",
+        "--target-probability",
+        "0.35",
+        "--target-position-weights",
+        "1",
+        "3",
+        "1",
+        "1",
+        "--output",
+        "artifacts/project_cnn_v5b.pt"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
       "name": "调试当前 Python 文件",
       "type": "debugpy",
       "request": "launch",
@@ -70,4 +281,3 @@
     }
   ]
 }
-

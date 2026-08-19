@@ -42,6 +42,69 @@ class FixedLengthCNN(nn.Module):
         return logits.view(images.shape[0], self.label_length, self.n_classes)
 
 
+def _project_cnn_block(in_channels: int, out_channels: int) -> nn.Sequential:
+    """A small feature block for high-contrast grayscale captchas."""
+
+    return nn.Sequential(
+        nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+        nn.BatchNorm2d(out_channels),
+        nn.ReLU(inplace=True),
+        nn.MaxPool2d(kernel_size=2, stride=2),
+    )
+
+
+class ProjectCaptchaCNN(nn.Module):
+    """Lightweight fixed-length CNN for ``1 x 50 x 200`` project captchas."""
+
+    def __init__(
+        self,
+        n_classes: int = 36,
+        label_length: int = 4,
+        input_size: tuple[int, int] = (50, 200),
+    ) -> None:
+        super().__init__()
+        if n_classes < 2:
+            raise ValueError("n_classes must be at least 2")
+        if label_length <= 0:
+            raise ValueError("label_length must be positive")
+        if input_size[0] <= 0 or input_size[1] <= 0:
+            raise ValueError("input size must be positive")
+
+        self.n_classes = n_classes
+        self.label_length = label_length
+        self.input_size = input_size
+        self.features = nn.Sequential(
+            OrderedDict(
+                [
+                    ("block_1", _project_cnn_block(1, 24)),
+                    ("block_2", _project_cnn_block(24, 48)),
+                    ("block_3", _project_cnn_block(48, 96)),
+                    ("block_4", _project_cnn_block(96, 128)),
+                ]
+            )
+        )
+        # Eight horizontal bins preserve left-to-right information: roughly
+        # two feature bins are available for each of the four characters.
+        self.pool = nn.AdaptiveAvgPool2d((2, 8))
+        self.dropout = nn.Dropout(0.20)
+        self.classifier = nn.Linear(128 * 2 * 8, label_length * n_classes)
+
+    def forward(self, images: torch.Tensor) -> torch.Tensor:
+        if images.ndim != 4:
+            raise ValueError(f"expected B x C x H x W input, got shape {tuple(images.shape)}")
+        if images.shape[1] != 1:
+            raise ValueError(f"expected one grayscale channel, got {images.shape[1]}")
+        if tuple(images.shape[-2:]) != self.input_size:
+            raise ValueError(
+                f"expected spatial size {self.input_size}, got {tuple(images.shape[-2:])}"
+            )
+
+        features = self.pool(self.features(images))
+        features = self.dropout(torch.flatten(features, 1))
+        logits = self.classifier(features)
+        return logits.view(images.shape[0], self.label_length, self.n_classes)
+
+
 class CTCRecognizer(nn.Module):
     """CNN feature extractor followed by a bidirectional LSTM and CTC head."""
 
