@@ -28,6 +28,9 @@ dev = [
 tensorboard = [
     "tensorboard>=2.16",
 ]
+baseline = [
+    "ddddocr==1.6.1",
+]
 
 [project.scripts]
 captcha-break = "captcha_break.cli:main"
@@ -45,4 +48,3 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-

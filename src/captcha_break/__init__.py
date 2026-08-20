@@ -17,6 +17,12 @@ from .project_generator import (
     project_style_for_geometry,
     project_style_for_source,
 )
+from .recognizer import (
+    BatchRecognitionItem,
+    ProjectCaptchaRecognizer,
+    RecognitionResult,
+    image_source_to_bytes,
+)
 
 __all__ = [
     "BOTDETECT_FONT_CANDIDATES",
@@ -25,14 +31,18 @@ __all__ = [
     "DEFAULT_VISUAL_PROFILES",
     "PROJECT_ALPHABET",
     "VISUAL_STYLES",
+    "BatchRecognitionItem",
     "CaptchaConfig",
     "CaptchaVisualProfile",
     "GeometryPreset",
     "ProjectCaptchaGenerator",
+    "ProjectCaptchaRecognizer",
     "ProjectCaptchaStyle",
+    "RecognitionResult",
     "SourcePreset",
     "VisualStyle",
     "generate_captcha",
+    "image_source_to_bytes",
     "project_style_for_geometry",
     "project_style_for_source",
     "random_text",

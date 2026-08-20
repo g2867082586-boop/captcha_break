@@ -358,6 +358,93 @@
       "justMyCode": true
     },
     {
+      "name": "17 - 评估 ddddocr（38张验证图）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/34_evaluate_ddddocr.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img_split/validation",
+        "--model",
+        "both",
+        "--output",
+        "artifacts/ddddocr_validation38.csv"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "18 - 评估 ddddocr（全部138张真实图）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/34_evaluate_ddddocr.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "--model",
+        "both",
+        "--output",
+        "artifacts/ddddocr_all138.csv"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "19 - ddddocr组合识别（38张验证图）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/35_ddddocr_fallback.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img_split/validation",
+        "--output",
+        "artifacts/ddddocr_fallback_validation38.csv"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "20 - ddddocr组合识别（全部138张）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/35_ddddocr_fallback.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "--output",
+        "artifacts/ddddocr_fallback_all138.csv"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "21 - 单张图片项目接口",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/36_recognize_one.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img/KJUU_001.jfif"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "22 - 批量项目接口（全部138张）",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/37_recognize_batch.py",
+      "args": [
+        "C:/Users/Thinkpad/Downloads/img",
+        "--labeled",
+        "--output",
+        "artifacts/batch_recognition_all138.csv"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
       "name": "调试当前 Python 文件",
       "type": "debugpy",
       "request": "launch",

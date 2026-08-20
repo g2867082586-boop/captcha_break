@@ -105,7 +105,11 @@ def main() -> None:
         length=style.length,
         expected_size=(style.width, style.height),
     )
-    train_dataset = AugmentedRealCaptchaDataset(real_train, repeats=args.repeats)
+    train_dataset = AugmentedRealCaptchaDataset(
+        real_train,
+        repeats=args.repeats,
+        seed=args.seed,
+    )
     validation_dataset = RealCaptchaDataset(
         validation_directory,
         characters=characters,
